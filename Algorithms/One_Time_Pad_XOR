@@ -1,0 +1,104 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Random;
+
+public class One_Time_Pad_XOR {
+
+	@SuppressWarnings({ "unused", "static-access" })
+	public One_Time_Pad_XOR(mode mode, File file) {
+		
+		Path filePath = file.toPath();
+		int fileLength = (int) file.length();
+		
+		Path keyPath = FilePaths.keyFile.toPath();
+		int keyLength = fileLength;
+		
+		if(mode.equals(mode.encrypt)) {
+			byte[] key = generateNewKey(keyLength);								//decrypt
+			encryptFile(fileLength, filePath, key, keyPath);					//decrypt
+		} else if(mode.equals(mode.decrypt)) {		
+			byte[] key = getKey(keyLength, keyPath);							//encrypt
+			decryptFile(fileLength, filePath, key);								//encrypt
+		}
+	}
+	
+	public static byte[] generateNewKey(int fileLength) {
+		Random random = new Random();
+
+		byte[] key = new byte[fileLength];
+
+		for(int i = 0; i < fileLength; i++) {
+			key[i] = (byte) random.nextInt(2);
+		}
+
+		return key;
+	}
+	
+	public static byte[] getKey(int keyLength, Path keyPath) {
+		byte[] key = new byte[keyLength];
+		
+		try {
+			key = Files.readAllBytes(keyPath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return key;
+	}
+	
+	public static void writeKey(Path keyFilePath, byte[] key) {
+		try {
+			Files.write(keyFilePath, key);
+		} catch (IOException e) {
+			System.out.println("IOException occured!");
+		}
+	}
+	
+	
+	public static byte[] getFileBytes(int fileLength, Path filePath) {
+		byte[] fileBytes = new byte[fileLength];
+		
+		try {
+			fileBytes = Files.readAllBytes(filePath);
+		} catch (IOException e) {
+			System.out.println("IOException occured!");
+		}
+		
+		return fileBytes;
+	}
+	
+	public static void writeFileBytes(Path filePath, byte[] key) {
+		try {
+			Files.write(filePath, key);
+		} catch (IOException e) {
+			System.out.println("IOException occured!");
+		}
+	}
+	
+	
+	public static void encryptFile(int fileLength, Path filePath, byte[] key, Path keyFilePath) {
+		byte[] originalFileBytes = getFileBytes(fileLength, filePath);
+		byte[] encryptedFileBytes = new byte[fileLength];
+		for(int i = 0; i < fileLength; i++) {
+			encryptedFileBytes[i] = (byte) (originalFileBytes[i] ^ key[i]);
+		}
+		
+		writeKey(keyFilePath, key);
+		writeFileBytes(filePath, encryptedFileBytes);	
+ 	}
+
+	public static void decryptFile(int fileLength, Path filePath, byte[] key) {
+		byte[] encryptedFileBytes = getFileBytes(fileLength, filePath);
+		byte[] decryptedFileBytes = new byte[fileLength];
+		
+		for(int i = 0; i < fileLength; i++) {
+			decryptedFileBytes[i] = (byte) (encryptedFileBytes[i] ^ key[i]);
+		}
+		
+		writeFileBytes(filePath, decryptedFileBytes);
+		
+	}
+
+}
