@@ -16,11 +16,11 @@ public class One_Time_Pad_XOR {
 		int keyLength = fileLength;
 		
 		if(mode.equals(mode.encrypt)) {
-			byte[] key = generateNewKey(keyLength);								//decrypt
-			encryptFile(fileLength, filePath, key, keyPath);					//decrypt
+			byte[] key = generateNewKey(keyLength);								//encrypt
+			encryptFile(fileLength, filePath, key, keyPath);					        //encrypt
 		} else if(mode.equals(mode.decrypt)) {		
-			byte[] key = getKey(keyLength, keyPath);							//encrypt
-			decryptFile(fileLength, filePath, key);								//encrypt
+			byte[] key = getKey(keyLength, keyPath);							//decrypt
+			decryptFile(fileLength, filePath, key);								//decrypt
 		}
 	}
 	
